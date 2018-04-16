@@ -15,8 +15,8 @@ func main() {
 
 func newApp() *cli.App {
 	app := cli.NewApp()
-	app.Name = "url2mdlink"
-	app.Usage = "Convert a url to the markdown link"
+	app.Name = "mli"
+	app.Usage = "Convert a URL to its markdown link"
 	app.Version = Version
 	app.Author = "takatori"
 	app.Email = "takatori@gmail.com"
