@@ -5,8 +5,9 @@ import (
 	"log"
 	"net/http"
 	"os"
-
+    "strings"
 	"github.com/PuerkitoBio/goquery"
+
 	"github.com/urfave/cli"
 )
 
@@ -32,6 +33,6 @@ func Action(c *cli.Context) {
 		log.Fatal(err)
 	}
 	if h1 := doc.Find("h1").First(); h1 != nil {
-		fmt.Printf("[%s](%s)", h1.Text(), url)
+		fmt.Printf("[%s](%s)", strings.TrimSpace(h1.Text()), url)
 	}
 }
