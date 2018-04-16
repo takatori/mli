@@ -2,7 +2,7 @@
 
 ## Overview
 
-url2mdlink convert a url to it's markdown link.
+**url2mdlink** convert a URL to its markdown link.
 
 
 ## Installation
