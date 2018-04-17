@@ -5,13 +5,17 @@ import (
 	"log"
 	"net/http"
 	"os"
-    "strings"
+	"strings"
+
 	"github.com/PuerkitoBio/goquery"
 
+	"github.com/atotto/clipboard"
 	"github.com/urfave/cli"
 )
 
-var Flags = []cli.Flag{}
+var Flags = []cli.Flag{
+	cli.BoolFlag{Name: "clip, c", Usage: "copy to clipboard"},
+}
 
 func Action(c *cli.Context) {
 
@@ -32,7 +36,13 @@ func Action(c *cli.Context) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if h1 := doc.Find("h1").First(); h1 != nil {
-		fmt.Printf("[%s](%s)", strings.TrimSpace(h1.Text()), url)
-	}
+	doc.Find("title,h1,h2").Each(func(i int, s *goquery.Selection) {
+		title := s.Text()
+		mdlink := fmt.Sprintf("[%s](%s)\n", strings.TrimSpace(title), url)
+		if c.Bool("clip") {
+			if err := clipboard.WriteAll(mdlink); err != nil {
+				os.Exit(1)
+			}
+		}
+	})
 }
