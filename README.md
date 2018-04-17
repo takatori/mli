@@ -18,7 +18,8 @@ $ mli https://github.com/takatori/mli
 [takatori/mli](https://github.com/takatori/mli)
 ```
 
-## Flags
+## Options
 
-Todo
+**--clipboard, -c**
 
+copy generated markdown link to clipboard.
