@@ -15,10 +15,11 @@ import (
 
 var Flags = []cli.Flag{
 	cli.BoolFlag{Name: "clip, c", Usage: "copy to clipboard"},
+	cli.BoolFlag{Name: "verbose, v", Usage: "make the operation more talkative"},
 }
 
 func init() {
-    cli.AppHelpTemplate = `NAME:
+	cli.AppHelpTemplate = `NAME:
    {{.Name}} - {{.Usage}}
 
 USAGE:
@@ -37,6 +38,53 @@ VERSION:
    {{.Version}}
    {{end}}
 `
+
+	cli.VersionFlag = cli.BoolFlag{
+		Name:  "version, V",
+		Usage: "print the version",
+	}
+}
+
+func fetch(url string) *goquery.Document {
+
+	res, err := http.Get(url)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != 200 {
+		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
+	}
+
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return doc
+}
+
+func scan(url string, doc *goquery.Document) []string {
+
+	s := doc.Find("title,h1,h2")
+	r := make([]string, s.Length())
+
+	s.Each(func(i int, s *goquery.Selection) {
+		title := s.Text()
+		r[i] = fmt.Sprintf("[%s](%s)\n", strings.TrimSpace(title), url)
+	})
+
+	return r
+}
+
+func output(links []string, c *cli.Context) {
+	if c.Bool("clip") {
+		if err := clipboard.WriteAll(links[0]); err != nil {
+			os.Exit(1)
+		}
+	} else {
+		fmt.Print(links[0])
+	}
 }
 
 func Action(c *cli.Context) {
@@ -46,25 +94,10 @@ func Action(c *cli.Context) {
 		os.Exit(1)
 	}
 	url := c.Args().Get(0)
-	res, err := http.Get(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer res.Body.Close()
-	if res.StatusCode != 200 {
-		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
-	}
-	doc, err := goquery.NewDocumentFromReader(res.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	doc.Find("title,h1,h2").Each(func(i int, s *goquery.Selection) {
-		title := s.Text()
-		mdlink := fmt.Sprintf("[%s](%s)\n", strings.TrimSpace(title), url)
-		if c.Bool("clip") {
-			if err := clipboard.WriteAll(mdlink); err != nil {
-				os.Exit(1)
-			}
-		}
-	})
+
+	doc := fetch(url)
+
+	links := scan(url, doc)
+
+	output(links, c)
 }
