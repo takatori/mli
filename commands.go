@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
-
 	"github.com/atotto/clipboard"
 	"github.com/urfave/cli"
 )
@@ -50,6 +49,7 @@ func fetch(url string) *goquery.Document {
 	res, err := http.Get(url)
 	if err != nil {
 		log.Fatal(err)
+
 	}
 	defer res.Body.Close()
 
@@ -78,12 +78,12 @@ func scan(url string, doc *goquery.Document) []string {
 }
 
 func output(links []string, c *cli.Context) {
+	fmt.Print(links[0])            
 	if c.Bool("clip") {
 		if err := clipboard.WriteAll(links[0]); err != nil {
 			os.Exit(1)
 		}
 	} else {
-		fmt.Print(links[0])
 	}
 }
 
