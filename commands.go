@@ -14,6 +14,7 @@ import (
 
 var Flags = []cli.Flag{
 	cli.BoolFlag{Name: "clip, c", Usage: "copy to clipboard"},
+	cli.BoolFlag{Name: "all, a", Usage: "print all candidate"},
 	cli.BoolFlag{Name: "verbose, v", Usage: "make the operation more talkative"},
 }
 
@@ -71,21 +72,33 @@ func scan(url string, doc *goquery.Document) []string {
 
 	s.Each(func(i int, s *goquery.Selection) {
 		title := s.Text()
-		r[i] = fmt.Sprintf("[%s](%s)\n", strings.TrimSpace(title), url)
+		r[i] = fmt.Sprintf("[%s](%s)", strings.TrimSpace(title), url)
 	})
 
 	return r
 }
 
-func output(links []string, c *cli.Context) {
-	fmt.Print(links[0])            
+func format(links []string, c *cli.Context) string {
+
+	if c.Bool("all") {
+		return SelectAll(links)
+	}
+	return SelectTop(links)
+
+}
+
+func output(result string, c *cli.Context) {
+
+	fmt.Print(result)
+
 	if c.Bool("clip") {
-		if err := clipboard.WriteAll(links[0]); err != nil {
+		if err := clipboard.WriteAll(result); err != nil {
 			os.Exit(1)
 		}
-	} else {
 	}
+	// TODO: ファイル出力
 }
+
 
 func Action(c *cli.Context) {
 
@@ -99,5 +112,7 @@ func Action(c *cli.Context) {
 
 	links := scan(url, doc)
 
-	output(links, c)
+    mdlink := format(links, c)
+    
+	output(mdlink, c)
 }
