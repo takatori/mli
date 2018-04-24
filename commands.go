@@ -96,9 +96,7 @@ func output(result string, c *cli.Context) {
 			os.Exit(1)
 		}
 	}
-	// TODO: ファイル出力
 }
-
 
 func Action(c *cli.Context) {
 
@@ -112,7 +110,7 @@ func Action(c *cli.Context) {
 
 	links := scan(url, doc)
 
-    mdlink := format(links, c)
-    
+	mdlink := format(links, c)
+
 	output(mdlink, c)
 }
