@@ -23,3 +23,7 @@ $ mli https://github.com/takatori/mli
 **--clipboard, -c**
 
 copy generated markdown link to clipboard.
+
+**--all, -a**
+
+print all the link candidates.
